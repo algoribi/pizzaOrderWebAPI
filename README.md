@@ -35,7 +35,7 @@ var usersRouter = require('./routes/users');
 
 var app = express();  // --- express 패키지를 호풀해 app 변수 객체를 만든다.
 
-// view engine setup  // --- app.set()으로 익스프레스 앱을 설정한다.
+// view engine setup  // --- app.set()으로 express 앱을 설정한다.
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
