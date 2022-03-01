@@ -1,37 +1,39 @@
 # pizzaOrderWebAPI
+
 > 피자 주문을 받는 API
+
+`npm init`을 통해 [package.json](https://github.com/algoribi/TIL/blob/main/TypeScript/01_setting_npm.md)을 생성한다.
 
 ## 사용 프레임워크 & 라이브러리
 
-### 1. Express 
-> node.js로 서버 구축을 위한 프레임워크 [공식 사이트](https://expressjs.com/)
+### Express
 
-Express는 서버를 손쉽게 구축할 수 있도록 도와주는 프레임워크로, Express-generator는 package.json 파일 자동 생성 및 서버 구축에 필요한 기본 폴더 구조까지 자동으로 잡아준다.
+> `npm install express`을 통해 express를 install 한다.
 
-- 설치 명령어 : `npm install -g express-generator` / Express-generator는 콘솔 명령어로 사용해야 하므로 전역 옵션(`-g`)으로 설치를 해야 한다.
-- 프로젝트 생성 : `express PROJECT_NAME --view=pug nodejs-express-typescript-sample` / Express-generator는 기본적으로 Jade를 템플릿 엔진으로 설치한다. 하지만 ejs와 같이 원하는 템플릿 엔진으로 바꿔도 무관하다.
-- 모듈 설치 : (프로젝트 경로로 이동) `npm install`
-- 서버 구동 : `npm start`
-- 테스트(기본 포트 3000으로 접근) : `http://localhost:3000`
+express란 NodeJS를 사용하여 쉽게 서버를 구성할 수 있게 만든 클래스와 라이브러리의 집합체(프레임워크)이다. express는 크게 네 가지 부분으로 이해할 수 있다.
 
-#### Express 구조
+- Application : 불러온 익스프레스 객체에는 하나의 함수가 할당되는데, 그 함수를 실행하면 익스프레스 객체가 생성된다. 익스프레스 class를 이용해 익스프레스 객체를 만든다고 생각하면 된다. 이것을 익스프레서 어플리케이션(Application)이라고 한다.
 
-- bin/www : http 모듈에 express 모듈을 연결하며, 접속 포트를 지정할 수 있다. 서버를 실행하는 스크립트이다.
-- public : 정적 파일(자바스크립트 파일, 이미지 파일, CSS 등을 포함)을 위한 폴더로서, 외부(브라우저 등의 클라이언트)에서 접근 가능한 파일들을 모아 둔 디렉토리이다.
-- routes : 라우터들을 관리하는 곳으로 index.js를 루트로 라우팅 관리를 해주면 된다. 클라이언트의 요청 별로 어떤 로직을 수행할지 정해놓는다. 라우팅이 어떻게 작동하는지는 `routes/index.js` 및 `routes/users.js` 파일에 구현되어 있다.
-- views : request 요청에 대한 로직을 처리한 후 클라이언트에 응답을 보낼 때 html 코드로 변환해서 반환하는 파일을 정의한 폴더
-- app.js : express 설정 정보가 담겨있는 파일이다. 핵심적인 서버의 역할을 하며 미들웨어 관리를 하는 곳이다.
+- Request : 콜백 함수에서 전달해 주는 첫 번째 파라미터 **req**는 익스프레스 요청(Request) 객체라고 한다. 요청 객체는 말 그대로 서버로 요청한 클라이언트에 대한 정보를 담고 있다. 이는 하나의 객체 형태로 되어 있고, key와 함수들로 구성되어 있다.
 
-마지막으로 post 형식의 Request를 테스트하려면 [Postman](https://www.postman.com/)을 사용해야 한다. Postman은 서버에 get, post, put, delete 요청을 보낼 수 있다.
+```
+-  req.params: url 파라미터 정보를 조회
+- req.query: 쿼리 문자열을 조회
+- req.body: 요청 바디를 조회
+```
 
-</br>
+- Response : 콜백 함수에서 전달해 주는 두 번째 파라미터 **res**는 익스프레스 응답(Response) 객체라고 한다. 응답 객체는 클라이언트의 요청에 응답하기 위한 함수들로 구성된 객체로, 다음과 같은 함수들을 사용한다.
 
-### 2. Nodemon
-> node.js 기반의 어플리케이션 개발 시 파일 변경이 감지될 때 자동으로 재시작하도록 도와준다. [공식 사이트](https://www.npmjs.com/package/nodemon)
+```
+- res.send()
+- res.json()
+- res.status()
+```
 
-코드를 수정할 때마다 서버를 다시 시작해줘야 하는 것은 귀찮은 일이다. nodemon은 이 일을 자동으로 대신해준다.
-
-- 설치 명령어 : `npm install nodemon --save-dev` / `-dev` 옵션을 사용하는 이유는 local에서만 사용할 예정이기 때문이다.
-- 실행 : 기존에 `node -` 키워드로 실행하던 명령어를 `nodemon -`으로 변경해주면 된다.
+- Routing : 어플리케이션을 이용해 라우팅 조직을 만들 수 있지만 익스프레스에는 별도로 **Router** 클래스를 제공한다. 라우터 클래스를 이용하면 라우팅 조직을 좀 더 구조적으로 만들 수 있다.
 
 </br>
+
+## 피자 주문 API 설계하기
+
+> [REST API에 대한 정리글](https://github.com/algoribi/TIL/blob/main/TypeScript/03_API.md)
