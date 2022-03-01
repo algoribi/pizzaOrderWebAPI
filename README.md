@@ -8,7 +8,7 @@
 
 ### Express
 
-> `npm install express`을 통해 express를 install 한다.
+> install : `npm install express`, `npm i --save-dev @types/express @types/node`
 
 express란 NodeJS를 사용하여 쉽게 서버를 구성할 수 있게 만든 클래스와 라이브러리의 집합체(프레임워크)이다. express는 크게 네 가지 부분으로 이해할 수 있다.
 

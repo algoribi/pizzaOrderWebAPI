@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "outDir": "./build",
+      "strict": true,
+      "moduleResolution": "node",
+      "sourceMap": false,
+      "esModuleInterop": true,
+      "downlevelIteration": true,
+      "resolveJsonModule": true
+    },
+    "exclude": [
+      "node_modules"
+    ]
+  }
