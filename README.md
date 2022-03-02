@@ -10,7 +10,9 @@
 
 > install : `npm install express`, `npm i --save-dev @types/express @types/node`
 
-express란 NodeJS를 사용하여 쉽게 서버를 구성할 수 있게 만든 클래스와 라이브러리의 집합체(프레임워크)이다. <!---express는 크게 네 가지 부분으로 이해할 수 있다.
+express란 NodeJS를 사용하여 쉽게 서버를 구성할 수 있게 만든 클래스와 라이브러리의 집합체(프레임워크)이다.
+<!---
+express는 크게 네 가지 부분으로 이해할 수 있다.
 
 
 - Application : 불러온 익스프레스 객체에는 하나의 함수가 할당되는데, 그 함수를 실행하면 익스프레스 객체가 생성된다. 익스프레스 class를 이용해 익스프레스 객체를 만든다고 생각하면 된다. 이것을 익스프레서 어플리케이션(Application)이라고 한다.
