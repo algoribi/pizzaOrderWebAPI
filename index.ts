@@ -12,13 +12,12 @@ app.get('/', (req, res) => {
 });
 
 app.post("/orders", (req, res) => {
-    try {
-        const userOrder = new TakeOrders();
-        const result = userOrder.userInput(req.body);
-        if(result === "error") throw "잘못된 주문입니다!";
+    const userOrder = new TakeOrders();
+    const result = userOrder.userInput(req.body);
+    if(result === "error") {
+        res.status(415).send({ error : "415 error : 잘못된 주문입니다!" }); // 415 : 지원되지 않는 유형
+    } else { 
         res.send(result);
-    } catch(err) {
-        res.status(415).send({ error : `415 error : ${err}` }); // 415 : 지원되지 않는 유형
     }
 });
 
