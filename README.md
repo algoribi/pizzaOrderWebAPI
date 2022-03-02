@@ -1,8 +1,9 @@
 # pizzaOrderWebAPI
 
 > 피자 주문을 받는 API
-
+<!--
 `npm init`을 통해 [package.json](https://github.com/algoribi/TIL/blob/main/TypeScript/01_setting_npm.md)을 생성한다.
+-->
 
 ## 사용 프레임워크 & 라이브러리
 
