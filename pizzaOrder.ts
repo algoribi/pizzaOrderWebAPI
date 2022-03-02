@@ -8,10 +8,8 @@ class TakeOrders {
         const regexr2 = /^[가-힣|0-9]{1,}[(](\s*[가-힣|0-9]{1,}\s*,)*\s*[가-힣|0-9]{1,}\s*[)]$/;
         
         for (let idx in userOrder.orders) {
-            if ((!regexr.test(userOrder.orders[idx]) && !regexr2.test(userOrder.orders[idx]))) { 
+            if ((!regexr.test(userOrder.orders[idx]) && !regexr2.test(userOrder.orders[idx]))) { // 정규식에 위배되는 입력
                 return this.inputGuidePrint();
-            } else if (this.checkDone(userOrder.orders[idx])) {
-                break;
             } else {
                 let reg = userOrder.orders[idx].match(/[가-힣|0-9]{1,}/g);
                 if (reg === null) {
@@ -28,17 +26,7 @@ class TakeOrders {
     }
 
     inputGuidePrint() {
-        return { "주문 결과" : "잘못된 주문입니다."};
-        /*
-        console.log(`[올바른 메뉴를 입력했는지 확인해 주세요!]`);
-        console.log("* 메뉴는 상품명과 상품 코드를 통해 입력받습니다.");
-        console.log("* 메뉴 사이에는 엔터(개행)를 입력해 주세요.");
-        console.log("* 'Done'을 입력 시 주문을 종료합니다.\n");
-        */
-    }
-    
-    checkDone(inputData: string) {
-        return inputData.toLowerCase() === "done";
+        return "error";
     }
 
     checkFalse(inputData: string) {
@@ -118,23 +106,6 @@ class Order {
     IsNotFound(input: string) {
         return input === "not found";
     }
-    
-    confirmOrder() {
-        /*
-        console.log("\n[주문을 확인합니다.]"); 
-
-        for (let order of this.userPizzaOrders) {
-            order.printMenu();
-        }
-
-        for (let order of this.userDrinkOrders) {
-            order.printMenu();
-        }
-
-        console.log(`-----------------------------\n => 총 금액 : ${this.totalPrice}원`);
-        console.log("[주문을 종료합니다.]\n");
-        */
-    }
 }
 
 class Menu {
@@ -146,10 +117,6 @@ class Menu {
         this.name = name;
         this.productCode = productCode;
         this.price = price;
-    }
-
-    printMenu() { 
-        console.log(`* ${this.name}(${this.productCode}) : ${this.price}`);
     }
 }
 
@@ -168,16 +135,6 @@ class PizzaMenu extends Menu {
         }
         
         return true;
-    }
-
-    printMenu() {
-        console.log(`* ${this.name}(${this.productCode}) : ${this.price}`);
-        if (this.toppings.length !== 0) {
-            console.log(`   ㄴ 추가한 토핑 : `);
-            for (let topping of this.toppings) {
-                console.log(`   ${topping.name}(${topping.productCode})`);
-            }
-        }
     }
 }
 
