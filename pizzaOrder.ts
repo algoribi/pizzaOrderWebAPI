@@ -133,7 +133,6 @@ class PizzaMenu extends Menu {
                 return false;
             }
         }
-        
         return true;
     }
 }
