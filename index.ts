@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import menu from './menu.json';
 import { TakeOrders } from './pizzaOrder';
 
@@ -13,11 +13,15 @@ app.get('/', (req, res) => {
 
 app.post("/orders", (req, res) => {
     const userOrder = new TakeOrders();
-    const result = userOrder.userInput(req.body);
-    if(result === "error") {
-        res.status(415).send({ error : "415 error : 잘못된 주문입니다!" }); // 415 : 지원되지 않는 유형
-    } else { 
-        res.send(result);
+    try {
+        const result = userOrder.makeOrder(req.body);
+        res.send({
+            price: userOrder.calcPrice(result),
+            result,
+        });
+    } catch(e) {
+        console.error(e);
+        res.status(500).send({ error : "415 error : 잘못된 주문입니다!" }); // 415 : 지원되지 않는 유형
     }
 });
 

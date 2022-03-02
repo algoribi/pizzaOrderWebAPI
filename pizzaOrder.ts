@@ -1,142 +1,153 @@
 import menuJson from './menu.json';
 
-class TakeOrders {
-    private orders = new Order();
-
-    userInput(userOrder: {name : string, orders : string[]}) {
-        const regexr = /^[가-힣|0-9]{1,}$/;
-        const regexr2 = /^[가-힣|0-9]{1,}[(](\s*[가-힣|0-9]{1,}\s*,)*\s*[가-힣|0-9]{1,}\s*[)]$/;
+type MenuItem = { name: string, productCode: number, price: number, category: "pizza" | "drink" | "topping"};
+function buildMenu() {
+    const menu: { [key: string]: MenuItem} = {};
+    const addItem = (item: {name: string, price: number, productCode: number}, category: "pizza" | "drink" | "topping") => {
         
-        for (let idx in userOrder.orders) {
-            if ((!regexr.test(userOrder.orders[idx]) && !regexr2.test(userOrder.orders[idx]))) { // 정규식에 위배되는 입력
-                return this.inputGuidePrint();
-            } else {
-                let reg = userOrder.orders[idx].match(/[가-힣|0-9]{1,}/g);
-                if (reg === null) {
-                    return this.inputGuidePrint();
-                } else {
-                    if (!this.orders.addOrder(reg)) {
-                        return this.inputGuidePrint();
-                    }
-                }
+        const menuItem: MenuItem = { name: item.name, price: item.price, productCode: item.productCode, category }
+        menu[item.name] = menuItem;
+        menu[item.productCode.toString()] = menuItem;
+    }
+
+    for(const category in menuJson) {
+        if(category === "pizza") {
+            for(const item of menuJson[category]) {
+                addItem(item, category);
             }
-        }
-        
-        return JSON.stringify(this.orders);
-    }
-
-    inputGuidePrint() {
-        return "error";
-    }
-
-    checkFalse(inputData: string) {
-        return inputData.toLowerCase() === "false";
-    }
-}
-
-class Order {
-    userPizzaOrders: PizzaMenu[] = [];
-    userDrinkOrders: Menu[] = [];
-    totalPrice: number = 0;
-
-    addOrder(userInput: RegExpMatchArray) {
-        let pizzaCategory: boolean = false;
-        let pizza = new PizzaMenu("", 0, 0);
-
-        for (let idx in userInput) {
-            if (idx === "0") {
-                let pizzaMenu = this.IsPizza(userInput[idx]);
-                let drinkMenu = this.IsDrink(userInput[idx]);
-                if (!this.IsNotFound(pizzaMenu.name)) {
-                    pizzaCategory = true;
-                    pizza = new PizzaMenu(pizzaMenu.name, pizzaMenu.productCode, pizzaMenu.price);
-                } else if (!this.IsNotFound(drinkMenu.name)) {
-                    this.userDrinkOrders.push(new Menu(drinkMenu.name, drinkMenu.productCode, drinkMenu.price));
-                } else {
-                    return false;
-                }
-            } else {
-                let toppingMenu = this.IsTopping(userInput[idx]);
-                if (!pizzaCategory || this.IsNotFound(toppingMenu.name) || !pizza.IsSameTopping(toppingMenu)) {
-                    return false;
-                } else {
-                    pizza.toppings.push(new Menu(toppingMenu.name, toppingMenu.productCode, toppingMenu.price));
-                    pizza.price += toppingMenu.price;
-                }
+        } else if(category === "drink") {
+            for(const item of menuJson[category]) {
+                addItem(item, category);
             }
-        }
-
-        if (pizzaCategory) {
-            this.userPizzaOrders.push(pizza);
-            this.totalPrice += pizza.price;
+        } else if(category === "topping") {
+            for(const item of menuJson[category]) {
+                addItem(item, category);
+            }
         } else {
-            this.totalPrice += this.userDrinkOrders[this.userDrinkOrders.length - 1].price;
+            throw new Error("invalid menu")
         }
+    }
+    
+    return menu;
+}
 
-        return true;
+const pizzaMenu = buildMenu();
+
+
+class PizzaOrder {
+    makeOrder(userOrder: { orders : string[]}): IMenu[] {
+        const regexr = /^([가-힣0-9]+)(?:\(\s*([가-힣0-9\s,]+)\s*\))?$/;
+        const orders: IMenu[] = [];
+        
+        for (const order of userOrder.orders) {
+            const regResult = regexr.exec(order);
+            if (regResult) {
+                const primary = regResult["1"];
+                const secondary = regResult["2"];
+
+                const primaryMenu = pizzaMenu[primary];
+                if (!primaryMenu) {
+                    throw new Error(`${primary} is not menu words`);
+                }
+
+                const toppings = secondary 
+                    ? secondary.split(",").map(s => s.trim())
+                    : undefined;
+                
+                const menuInstance = this.toMenuInstance(primaryMenu, toppings);
+                orders.push(menuInstance);
+            }
+        }
+        return orders;
     }
 
-    IsPizza(input: string) {
-        for (let pizza of menuJson.pizza) {
-            if (pizza.name === input || pizza.productCode.toString() === input) {
-                return pizza;
+    toMenuInstance(src: MenuItem, toppings?: string[]): IMenu {
+        if (src.category === "pizza") {
+            return new Pizza(src.name, src.productCode, src.price, toppings);
+        } else if (src.category === "drink") {
+            if (toppings) {
+                throw new Error("invalid topping");
             }
-        }
-        return { name: "not found", productCode: 0, price: 0 };
-    }
-    
-    IsDrink(input: string) {
-        for (let drink of menuJson.drink) {
-            if (drink.name === input || drink.productCode.toString() === input) {
-                return drink;
+            return new Drink(src.name, src.productCode, src.price);
+        } else if (src.category === "topping") {
+            if (toppings) {
+                throw new Error("invalid topping");
             }
+            return new Topping(src.name, src.productCode, src.price);
+        } else {
+            throw new Error(`${src.category} is invalid category`);
         }
-        return { name: "not found", productCode: 0, price: 0 };
     }
-    
-    IsTopping(input: string) {
-        for (let topping of menuJson.topping) {
-            if (topping.name === input || topping.productCode.toString() === input) {
-                return topping;
-            }
-        }
-        return { name: "not found", productCode: 0, price: 0 };
-    }
-    
-    IsNotFound(input: string) {
-        return input === "not found";
+
+    calcPrice(menu: IMenu[]) {
+        return menu.reduce((prev, cur) => prev + cur.getPrice(), 0);
     }
 }
 
-class Menu {
+
+interface IMenu {
     name : string;
     productCode : number;
     price: number;
+
+    getPrice(): number;
+}
+
+class Drink implements IMenu {
+    readonly name : string;
+    readonly productCode : number;
+    readonly price: number;
 
     constructor(name: string, productCode: number, price: number) {
         this.name = name;
         this.productCode = productCode;
         this.price = price;
     }
+
+    getPrice() {
+        return this.price;
+    }
 }
 
-class PizzaMenu extends Menu {
-    toppings: Menu[] = [];
-    
+class Topping implements IMenu {
+    readonly name : string;
+    readonly productCode : number;
+    readonly price: number;
+
     constructor(name: string, productCode: number, price: number) {
-        super(name, productCode, price);
+        this.name = name;
+        this.productCode = productCode;
+        this.price = price;
     }
 
-    IsSameTopping(topping : { name: string, productCode: number, price: number }) { 
-        for (let tp of this.toppings) {
-            if (tp.name === topping.name) {
-                return false;
-            }
-        }
-        return true;
+    getPrice(): number {
+        throw new Error("invalid");
+    }
+}
+
+
+class Pizza implements IMenu {
+    readonly name : string;
+    readonly productCode : number;
+    readonly price: number;
+    readonly toppings: Topping[];
+    
+    constructor(name: string, productCode: number, price: number, toppings?: string[]) {
+        this.name = name;
+        this.productCode = productCode;
+        this.price = price;
+        this.toppings = toppings ? toppings.map((t) => {
+            const tp = pizzaMenu[t];
+            if (!tp) { throw new Error(`invalid topping ${t}`); }
+            return new Topping(tp.name, tp.productCode, tp.price);
+        }) : [];
+    }
+
+    getPrice() {
+        return this.price + this.toppings.reduce((prev, cur) => (prev + cur.price), 0);
     }
 }
 
 export {
-    TakeOrders
+    PizzaOrder as TakeOrders
 }
